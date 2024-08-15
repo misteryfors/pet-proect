@@ -1,15 +1,16 @@
 import {NavLink, Link, Outlet, Route} from "react-router-dom";
 import React, {useState} from 'react';
 import axios from 'axios'
-import {useDispatch} from "react-redux";
-
+import {useSelector} from "react-redux";
 const Layout = () => {
-
+    const auth=useSelector(state =>state.auth)
+    console.log(auth)
     return(
         <div>
             <main>
                 <div className={"content"}>
                     11111
+                    {auth.isAuth? auth.user.login :""}"Мой аккаунт"
                     <NavLink className="HeaderNav" to="/">
                         <div id='logo'>
                             MAIN
@@ -35,7 +36,11 @@ const Layout = () => {
                             AllUsers
                         </div>
                     </NavLink>
-
+                    <NavLink className="HeaderNav" to="Login">
+                        <div id='logo'>
+                            Login
+                        </div>
+                    </NavLink>
                     <Outlet/>
                 </div>
             </main>
