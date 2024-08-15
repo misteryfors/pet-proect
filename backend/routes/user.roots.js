@@ -11,7 +11,7 @@ const db = require('../db_connect'); // Импортируем подключе�
 router.get('/allUsers', async (req, res) => {
     try {
         // Получаем всех пользователей из базы данных
-        db.all("SELECT id, login, password FROM users", [], (err, rows) => {
+        db.all("SELECT id, Login, password FROM users", [], (err, rows) => {
             if (err) {
                 return res.status(500).json({ message: 'Ошибка при получении данных из базы', error: err.message });
             }
@@ -24,6 +24,38 @@ router.get('/allUsers', async (req, res) => {
             }));
 
             return res.json(users);
+        });
+    } catch (e) {
+        return res.status(500).json({ message: 'Внутренняя ошибка сервера', error: e.message });
+    }
+});
+
+router.post('/login', async (req, res) => {
+    try {
+        const { login, password } = req.body;
+
+        // Запрос пользователя по логину
+        const query = "SELECT * FROM users WHERE Login=?";
+        db.get(query, [login], async (err, user) => {
+            if (err) {
+                return res.status(500).json({ message: 'Ошибка при получении данных из базы', error: err.message });
+            }
+
+            if (!user) {
+                // Если пользователь с таким логином не найден
+                return res.status(401).json({ message: 'Неверный логин или пароль' });
+            }
+
+            // Сравнение пароля
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                // Если пароль не совпадает
+                return res.status(401).json({ message: 'Неверный логин или пароль' });
+            }
+
+            // Успешная аутентификация
+            console.log('Успешный вход:', user);
+            return res.json({ message: 'Успешный вход', user });
         });
     } catch (e) {
         return res.status(500).json({ message: 'Внутренняя ошибка сервера', error: e.message });
@@ -50,7 +82,7 @@ router.post(
             // Хэшируем пароль перед сохранением в базу данных
             const hashedPassword = await bcrypt.hash(password, 8);
             // Проверяем, существует ли уже пользователь с таким email
-            db.get("SELECT * FROM users WHERE login = ?", [login], (err, user) => {
+            db.get("SELECT * FROM users WHERE Login = ?", [login], (err, user) => {
                 if (err) {
                     return res.status(500).json({ message: 'Ошибка при проверке пользователя в базе', error: err.message });
                 }
@@ -60,7 +92,7 @@ router.post(
                 }
                 // Вставляем нового пользователя в базу данных
                 db.run(
-                    "INSERT INTO users (login, password) VALUES ( ?, ?)",
+                    "INSERT INTO users (Login, password) VALUES ( ?, ?)",
                     [login, hashedPassword],
                     function (err) {
                         if (err) {

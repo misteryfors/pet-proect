@@ -7,8 +7,8 @@ var https = require('https');
 
 //const fileUpload = require("express-fileupload")
 const testRouter = require("./routes/test.roots")
-const usersRouter = require("./routes/test.roots")
-const productsRouter = require("./routes/test.roots")
+const usersRouter = require("./routes/user.roots")
+const productsRouter = require("./routes/product.roots")
 const app = express()
 
 

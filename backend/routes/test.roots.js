@@ -107,7 +107,7 @@ router.get('/allProduct', async (req, res) => {
 router.get('/allUsers', async (req, res) => {
     try {
         // Получаем всех пользователей из базы данных
-        db.all("SELECT id, login, password FROM users", [], (err, rows) => {
+        db.all("SELECT id, Login, password FROM users", [], (err, rows) => {
             if (err) {
                 return res.status(500).json({ message: 'Ошибка при получении данных из базы', error: err.message });
             }
@@ -169,7 +169,7 @@ router.post(
             // Хэшируем пароль перед сохранением в базу данных
             const hashedPassword = await bcrypt.hash(password, 8);
             // Проверяем, существует ли уже пользователь с таким email
-            db.get("SELECT * FROM users WHERE login = ?", [login], (err, user) => {
+            db.get("SELECT * FROM users WHERE Login = ?", [login], (err, user) => {
                 if (err) {
                     return res.status(500).json({ message: 'Ошибка при проверке пользователя в базе', error: err.message });
                 }
@@ -179,7 +179,7 @@ router.post(
                 }
                 // Вставляем нового пользователя в базу данных
                 db.run(
-                    "INSERT INTO users (login, password) VALUES ( ?, ?)",
+                    "INSERT INTO users (Login, password) VALUES ( ?, ?)",
                     [login, hashedPassword],
                     function (err) {
                         if (err) {
